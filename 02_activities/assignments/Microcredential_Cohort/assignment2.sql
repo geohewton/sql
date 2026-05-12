@@ -1,4 +1,4 @@
-/* ASSIGNMENT 2 */
+ /* ASSIGNMENT 2 */
 --Please write responses between the QUERY # and END QUERY blocks
 /* SECTION 2 */
 
@@ -23,8 +23,11 @@ Edit the appropriate columns -- you're making two edits -- and the NULL rows wil
 All the other rows will remain the same. */
 --QUERY 1
 
-
-
+SELECT
+product_name || ', ' ||
+coalesce(product_size,'(blank)') || ' (' ||
+coalesce(product_qty_type,'unit') || ')'
+FROM product;
 
 --END QUERY
 
@@ -41,8 +44,15 @@ HINT: One of these approaches uses ROW_NUMBER() and one uses DENSE_RANK().
 Filter the visits to dates before April 29, 2022. */
 --QUERY 2
 
+SELECT
+customer_id,
+vendor_id,
+market_date,
+transaction_time,
+row_number()OVER(PARTITION BY customer_id ORDER BY market_date, transaction_time ASC) as visit_rank
+FROM customer_purchases
 
-
+WHERE market_date < '2022-04-29';
 
 --END QUERY
 
@@ -53,8 +63,20 @@ only the customer’s most recent visit.
 HINT: Do not use the previous visit dates filter. */
 --QUERY 3
 
+DROP TABLE IF EXISTS temp.most_recent_visit;
 
+CREATE TABLE temp.most_recent_visit AS
+SELECT
+customer_id,
+vendor_id,
+market_date,
+transaction_time,
+row_number()OVER(PARTITION BY customer_id ORDER BY market_date DESC) as recent_visit_rank
+FROM customer_purchases;
 
+SELECT *
+FROM most_recent_visit
+WHERE recent_visit_rank = 1;
 
 --END QUERY
 
@@ -66,8 +88,18 @@ You can make this a running count by including an ORDER BY within the PARTITION 
 Filter the visits to dates before April 29, 2022. */
 --QUERY 4
 
-
-
+SELECT *
+FROM
+(
+SELECT 
+customer_id,
+product_id,
+vendor_id,
+row_number()OVER(PARTITION BY customer_id,product_id ORDER BY customer_id ASC) as customer_product_rank,
+COUNT()OVER(PARTITION BY customer_id, product_id ORDER BY product_id ASC) as product_purchase_count
+FROM customer_purchases
+)
+WHERE customer_product_rank = 1;
 
 --END QUERY
 
@@ -85,8 +117,14 @@ Remove any trailing or leading whitespaces. Don't just use a case statement for 
 Hint: you might need to use INSTR(product_name,'-') to find the hyphens. INSTR will help split the column. */
 --QUERY 5
 
-
-
+SELECT DISTINCT
+product_name,
+CASE
+	WHEN INSTR(product_name, '- ') > 0
+	THEN SUBSTR(product_name, INSTR(product_name, '- ') + 2)
+	ELSE NULL
+END AS description
+FROM product;
 
 --END QUERY
 
@@ -94,8 +132,19 @@ Hint: you might need to use INSTR(product_name,'-') to find the hyphens. INSTR w
 /* 2. Filter the query to show any product_size value that contain a number with REGEXP. */
 --QUERY 6
 
-
-
+SELECT DISTINCT
+product_id,
+product_name,
+product_size,
+product_category_id,
+product_qty_type,
+CASE
+	WHEN INSTR(product_name, '- ') > 0
+	THEN SUBSTR(product_name, INSTR(product_name, '- ') + 2)
+	ELSE NULL
+END AS description
+FROM product
+WHERE product_size REGEXP'[0-9]';
 
 --END QUERY
 
@@ -104,15 +153,52 @@ Hint: you might need to use INSTR(product_name,'-') to find the hyphens. INSTR w
 /* 1. Using a UNION, write a query that displays the market dates with the highest and lowest total sales.
 
 HINT: There are a possibly a few ways to do this query, but if you're struggling, try the following: 
-1) Create a CTE/Temp Table to find sales values grouped dates; 
+1) Create a CTE/Temp Table to find sales values grouped by dates; 
 2) Create another CTE/Temp table with a rank windowed function on the previous query to create 
 "best day" and "worst day"; 
 3) Query the second temp table twice, once for the best day, once for the worst day, 
 with a UNION binding them. */
 --QUERY 7
 
+DROP TABLE IF EXISTS temp.sales_values;
+
+CREATE TABLE temp.sales_values AS
+SELECT
+market_date,
+SUM(quantity * cost_to_customer_per_qty) as total_spend
+FROM customer_purchases
+GROUP BY market_date;
 
 
+DROP TABLE IF EXISTS temp.sales_values_ranked;
+
+CREATE TABLE temp.sales_values_ranked AS
+
+SELECT
+market_date,
+total_spend,
+best_day
+FROM(
+	SELECT
+	market_date,
+	total_spend,
+	RANK()OVER(ORDER BY total_spend DESC) as best_day
+	FROM sales_values
+)
+WHERE best_day = 1
+UNION
+SELECT
+market_date,
+total_spend,
+worst_day
+FROM(
+	SELECT
+	market_date,
+	total_spend,
+	RANK()OVER(ORDER BY total_spend ASC) as worst_day
+	FROM sales_values
+)
+WHERE worst_day = 1;
 
 --END QUERY
 

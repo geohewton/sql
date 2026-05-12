@@ -56,7 +56,14 @@ The store wants to keep customer addresses. Propose two architectures for the CU
 **HINT:** search type 1 vs type 2 slowly changing dimensions. 
 
 ```
-Your answer...
+My answer...
+
+Please see associated .png and .pdf files with the table architecture designed in both type 1 and type 2 formats. 
+
+Type 1 slowly changing dimension (SCD) tables (eg. customer_address_type1) allow data to be overwritten or replaced and have no way of recording historic data. Old data is overwritten with every subsequent update to the data. Type 1 SCD tables are used when it is not necessary or required to maintain old or past data or keep track of changes to data. For this case where we want to record customer addresses, we would only be able to keep track of a customer's current address and would have no way of knowing what their old or past addresses were, as these would be lost to the overwrite of the data.
+
+Type 2 SCD tables (eg. customer_address_type2) preserve historic data by adding a new row for each update to the data. In order to do this and identify the new data versus the old data, we add a column that refers to the data as being active or current (is_current, in the case of customer_address_type2) where the flag can either be TRUE or FALSE (active or inactive, current or not current, etc.). This helps us record changes to data over time and preserve the old data in cases where we may need to meet regulatory requirements, refer back to historic data, or analyse changes to data over time. 
+ 
 ```
 
 ***

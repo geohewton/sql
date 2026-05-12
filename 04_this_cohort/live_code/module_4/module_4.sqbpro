@@ -1,12 +1,15 @@
-<?xml version="1.0" encoding="UTF-8"?><sqlb_project><window><main_tabs open="structure browser pragmas query" current="3"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="100"/><column_width id="3" width="12168"/><column_width id="4" width="0"/><expanded_item id="0" parent="1"/><expanded_item id="1" parent="1"/><expanded_item id="2" parent="1"/><expanded_item id="3" parent="1"/><expanded_item id="4" parent="1"/></tab_structure><tab_browse><table title="booth" custom_title="0" dock_id="2" table="4,5:mainbooth"/><dock_state state="000000ff00000000fd0000000100000002000004ee0000034afc0100000002fb000000160064006f0063006b00420072006f00770073006500310100000000ffffffff0000000000000000fc00000000000004ee0000012f00fffffffa000000000100000002fb000000160064006f0063006b00420072006f00770073006500320100000000ffffffff0000012f00fffffffb000000180064006f0063006b00420072006f007700730065003100390000000000ffffffff0000000000000000000004ee0000000000000004000000040000000800000008fc00000000"/><default_encoding codec=""/><browse_table_settings><table schema="main" name="booth" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_" freeze_columns="0"><sort/><column_widths><column index="1" value="136"/><column index="2" value="164"/><column index="3" value="300"/><column index="4" value="108"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="temp" name="row_rank_dense" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_" freeze_columns="0"><sort/><column_widths><column index="1" value="72"/><column index="2" value="80"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table></browse_table_settings></tab_browse><tab_sql><sql name="IFNULL_NULLIF">/* MODULE 4 */
+<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="C:/Users/Meghan/DSI_Foundations/Module3_SQL/sql/05_src/sql/farmersmarket.db" readonly="0" foreign_keys="1" case_sensitive_like="0" temp_store="0" wal_autocheckpoint="1000" synchronous="2"/><attached/><window><main_tabs open="structure browser pragmas query" current="3"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="100"/><column_width id="3" width="8651"/><column_width id="4" width="0"/><expanded_item id="0" parent="1"/><expanded_item id="1" parent="1"/><expanded_item id="2" parent="1"/><expanded_item id="3" parent="1"/></tab_structure><tab_browse><table title="booth" custom_title="0" dock_id="2" table="4,5:mainbooth"/><dock_state state="000000ff00000000fd00000001000000020000036900000204fc0100000002fb000000160064006f0063006b00420072006f00770073006500310100000000ffffffff0000000000000000fc00000000000003690000017a00fffffffa000000000100000002fb000000160064006f0063006b00420072006f00770073006500320100000000ffffffff0000017a00fffffffb000000180064006f0063006b00420072006f007700730065003100390000000000ffffffff0000000000000000000003690000000000000004000000040000000800000008fc00000000"/><default_encoding codec=""/><browse_table_settings/></tab_browse><tab_sql><sql name="IFNULL_NULLIF*">/* MODULE 4 */
 /* NULL Management */
 
 
 /* 1. IFNULL: Missing product_size, missing product_qty_type */ 
-
+SELECT *,
+ifnull(product_size, 'Unknown') as new_product_size, 
+ifnull(product_size,product_qty_type) as silly_replacement
 
 /* 2. Coalesce */
-
+
+FROM product 
 
 
 /* 3. NULLIF
@@ -231,14 +234,17 @@ VALUES(&quot;tiger&quot;,2),
 
 
 --------------------------------------------------------------------------------------------------------------------------------------------
-</sql><sql name="INTERSECT_EXCEPT">/* MODULE 4 */
+</sql><sql name="INTERSECT_EXCEPT*">/* MODULE 4 */
 /* INTERSECT &amp; EXCEPT */
 
 /* 1. Find products that have been sold (e.g. are in customer purchases AND product) */ 
+SELECT *, 
+ifnull(product_size, 'Unknown') as new_product_size
 
 
 
 /* 2. Find products that have NOT been sold (e.g. are NOT in customer purchases even though in product) */
+
 
 
 
@@ -250,4 +256,4 @@ products that do not exist, because no products purchased are NOT in the product
 /* 4. We can remake the intersect with a WHERE subquery for more details ...  */
 
 
-</sql><current_tab id="0"/></tab_sql></sqlb_project>
+</sql><current_tab id="2"/></tab_sql></sqlb_project>
